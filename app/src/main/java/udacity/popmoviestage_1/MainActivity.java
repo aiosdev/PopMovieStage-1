@@ -35,7 +35,8 @@ public class MainActivity extends ActionBarActivity {
     private GridView mGridView;
     private GridViewAdapter mGridAdapter;
     private ArrayList<Movie> mMovie;
-    private String mBase_URL = "http://api.themoviedb.org/3/discover/movie?";
+//    private String mBase_URL = "http://api.themoviedb.org/3/discover/movie?";
+    private String mBase_URL = "http://api.themoviedb.org/3/movie/popular?";
     private String mSort = null;
     private String mApi_key = "&api_key=d6626beaba59a880217224dd4bb2c98d";
 
