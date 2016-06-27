@@ -62,7 +62,7 @@ public class MainActivity extends ActionBarActivity {
                         putExtra("year", movie.getYear()).
                         putExtra("description", movie.getDesc()).
                         putExtra("rating", movie.getRating()).
-                        putExtra("runtime", movie.getRuntime());
+                        putExtra("votes", movie.getVotes());
                 startActivity(intent);
             }
         });
@@ -176,9 +176,9 @@ public class MainActivity extends ActionBarActivity {
                 String year = post.optString("release_date");
                 String desc = post.optString("overview");
                 String rating = post.optString("vote_average");
-                String runtime = post.optString("runtime");
+                String votes = post.optString("vote_count");
                 System.out.println("===---===-------------==========vote_average是"+ rating);
-                System.out.println("===---===-------------==========runtime"+ runtime);
+                System.out.println("===---===-------------==========votes是"+ votes);
 
 
                 movie = new Movie();
@@ -187,7 +187,7 @@ public class MainActivity extends ActionBarActivity {
                 movie.setDesc(desc);
                 movie.setRating(rating);
                 movie.setImage(fullPosterPath);
-                movie.setRuntime(runtime);
+                movie.setVotes(votes);
 
                 mMovie.add(movie);
                 System.out.println("--------------------mMovie是" + mMovie);

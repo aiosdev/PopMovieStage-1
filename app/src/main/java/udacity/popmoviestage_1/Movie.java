@@ -12,7 +12,7 @@ public class Movie {
     private String desc;
     private String year;
     private String rating;
-    private String runtime;
+    private String votes;
 
     public Movie() {super();}
 
@@ -36,8 +36,8 @@ public class Movie {
 
     public void setRating (String rating){this.rating=rating;}
 
-    public String getRuntime(){return runtime;}
+    public String getVotes(){return votes;}
 
-    public void setRuntime(String runtime){this.runtime=runtime;}
+    public void setVotes(String votes){this.votes=votes;}
 
 }

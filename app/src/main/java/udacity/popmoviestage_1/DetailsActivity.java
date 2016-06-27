@@ -21,6 +21,7 @@ public class DetailsActivity extends ActionBarActivity {
     private TextView runtimeTextView;
     private TextView descTextView;
     private TextView ratingBar;
+    private TextView voteTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +40,8 @@ public class DetailsActivity extends ActionBarActivity {
         String desc = bundle.getString("description");
         String year = bundle.getString("year");
         String rating = bundle.getString("rating");
-        String runtime = bundle.getString("runtime");
-        System.out.println("==============+++++++++++++++runtime是" + runtime);
+        String votes = bundle.getString("votes");
+
 //        float fRating = Float.parseFloat(rating);
 //        ratingBar1.setRating(fRating / 2);
 
@@ -48,13 +49,13 @@ public class DetailsActivity extends ActionBarActivity {
         titleTextView.setText(title);
         yearTextView = (TextView) findViewById(R.id.year);
         yearTextView.setText(year);
-        runtimeTextView = (TextView) findViewById(R.id.runtime);
-        runtimeTextView.setText(runtime);
         descTextView = (TextView) findViewById(R.id.desc);
         descTextView.setText(desc);
         descTextView.setMovementMethod(new ScrollingMovementMethod());
         ratingBar = (TextView) findViewById(R.id.ratingbar1);
         ratingBar.setText(rating + "/" + "10");
+        voteTextView = (TextView) findViewById(R.id.votes);
+        voteTextView.setText(votes + "votes");
 
         imageView = (ImageView) findViewById(R.id.imageView);
         Picasso.with(this).load(image).into(imageView);
