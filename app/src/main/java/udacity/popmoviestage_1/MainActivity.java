@@ -90,27 +90,15 @@ public class MainActivity extends ActionBarActivity {
         mGridAdapter.clear();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.registerOnSharedPreferenceChangeListener(prefListener);
 
-        mSort = prefs.getString("sort", "sort_by=popularity.desc");
+        mSort = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_default));
         String fullPath = mBase_URL + mSort + mApi_key;
-
 
         AsyncHttpTask movieTask = new AsyncHttpTask();
         movieTask.execute(fullPath);
 
     }
 
-    private SharedPreferences.OnSharedPreferenceChangeListener prefListener =
-            new SharedPreferences.OnSharedPreferenceChangeListener(){
-
-                @Override
-                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-                    if(s.equals("sort")){
-
-                    }
-                }
-            };
 
     @Override
     public void onStart() {
