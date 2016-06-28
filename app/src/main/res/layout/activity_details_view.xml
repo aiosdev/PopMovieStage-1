@@ -1,86 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context=".DetailsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:orientation="vertical">
+        android:paddingTop="@dimen/activity_vertical_margin">
 
         <TextView
+            android:id="@+id/title"
             android:layout_width="fill_parent"
             android:layout_height="120dp"
+            android:background="#25918b"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="45sp"
-            android:id="@+id/title"
             android:textColor="#ffffffff"
-            android:background="#25918b" />
+            android:textSize="45sp" />
 
         <RelativeLayout
             android:id="@+id/linear"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"  >
+            android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/imageView"
-                android:contentDescription="@string/image"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/image" />
 
 
             <TextView
+                android:id="@+id/year"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
+                android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/imageView"
-                android:layout_marginLeft="10dp"
-                android:id="@+id/year" />
+                android:textSize="20sp" />
 
             <TextView
+                android:id="@+id/runtime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/runtime"
-                android:layout_marginLeft="10dp"
                 android:layout_below="@+id/year"
-                android:textSize="18sp"/>
+                android:layout_marginLeft="10dp"
+                android:textSize="18sp" />
 
             <TextView
+                android:id="@+id/ratingbar1"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/runtime"
-                android:layout_toRightOf="@+id/imageView"
-                android:layout_marginLeft="10dp"
                 android:layout_marginBottom="10dp"
-                android:id="@+id/ratingbar1"/>
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@+id/imageView"
+                android:textSize="20sp" />
 
             <TextView
+                android:id="@+id/votes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/votes"
-                android:layout_toRightOf="@+id/imageView"
                 android:layout_below="@+id/ratingbar1"
-                android:layout_marginLeft="10dp"/>
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@+id/imageView"
+                android:textSize="20sp" />
 
             <Button
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
                 android:id="@+id/bt"
-                android:text="MARK AS FAVORITE"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/votes"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@+id/imageView"
                 android:background="#4bb3d0"
                 android:elegantTextHeight="true"
-                android:layout_toRightOf="@+id/imageView"
-                android:layout_marginLeft="10dp"
-                android:layout_below="@+id/ratingbar1"
-                />
+                android:text="MARK AS FAVORITE" />
 
         </RelativeLayout>
 
@@ -88,23 +88,21 @@
             android:id="@+id/desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars = "vertical"
             android:maxLines="7"
-            android:textSize="20dp"
-            />
+            android:scrollbars="vertical"
+            android:textSize="20dp" />
 
 
         <ImageView
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:background="#ffffff"
-            />
+            android:background="#ffffff" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Trailers:"
-            android:textSize="18sp"/>
+            android:textSize="18sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -115,10 +113,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="setContentView" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trailer 1"/>
+                android:text="Trailer 1" />
 
         </LinearLayout>
 
@@ -131,15 +130,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="setContentView" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trailer 2"/>
+                android:text="Trailer 2" />
 
         </LinearLayout>
 
     </LinearLayout>
 
 
-
-</ScrollView>
+</RelativeLayout>

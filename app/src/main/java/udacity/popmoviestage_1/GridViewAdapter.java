@@ -32,22 +32,22 @@ public class GridViewAdapter extends ArrayAdapter<Movie> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View row = convertView;
+        View view = convertView;
         ViewHolder holder;
 
-        if (row == null) {
+        if (view == null) {
             LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
-            row = inflater.inflate(layoutResourceId, parent, false);
+            view = inflater.inflate(layoutResourceId, parent, false);
             holder = new ViewHolder();
-            holder.imageView = (ImageView) row.findViewById(R.id.movie_image);
-            row.setTag(holder);
+            holder.imageView = (ImageView) view.findViewById(R.id.movie_image);
+            view.setTag(holder);
         } else {
-            holder = (ViewHolder) row.getTag();
+            holder = (ViewHolder) view.getTag();
         }
 
         Movie movie = mGridData.get(position);
         Picasso.with(mContext).load(movie.getImage()).placeholder(R.drawable.loader).into(holder.imageView);
-        return row;
+        return view;
     }
 
     static class ViewHolder {

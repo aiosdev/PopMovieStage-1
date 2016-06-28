@@ -4,7 +4,7 @@ package udacity.popmoviestage_1;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,11 +14,10 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 
-public class DetailsActivity extends ActionBarActivity {
+public class DetailsActivity extends AppCompatActivity {
     private TextView titleTextView;
     private ImageView imageView;
     private TextView yearTextView;
-    private TextView runtimeTextView;
     private TextView descTextView;
     private TextView ratingBar;
     private TextView voteTextView;
@@ -31,7 +30,6 @@ public class DetailsActivity extends ActionBarActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
-//        final RatingBar ratingBar1 = (RatingBar) findViewById(R.id.ratingbar1);
 
         Bundle bundle = getIntent().getExtras();
 
@@ -42,9 +40,6 @@ public class DetailsActivity extends ActionBarActivity {
         String rating = bundle.getString("rating");
         String votes = bundle.getString("votes");
 
-//        float fRating = Float.parseFloat(rating);
-//        ratingBar1.setRating(fRating / 2);
-
         titleTextView = (TextView) findViewById(R.id.title);
         titleTextView.setText(title);
         yearTextView = (TextView) findViewById(R.id.year);
@@ -53,9 +48,9 @@ public class DetailsActivity extends ActionBarActivity {
         descTextView.setText(desc);
         descTextView.setMovementMethod(new ScrollingMovementMethod());
         ratingBar = (TextView) findViewById(R.id.ratingbar1);
-        ratingBar.setText(rating + "/" + "10");
+        ratingBar.setText(rating + " / " + "10");
         voteTextView = (TextView) findViewById(R.id.votes);
-        voteTextView.setText(votes + "votes");
+        voteTextView.setText(votes + " votes");
 
         imageView = (ImageView) findViewById(R.id.imageView);
         Picasso.with(this).load(image).into(imageView);

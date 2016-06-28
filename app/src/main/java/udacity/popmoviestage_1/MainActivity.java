@@ -35,10 +35,10 @@ public class MainActivity extends ActionBarActivity {
     private GridView mGridView;
     private GridViewAdapter mGridAdapter;
     private ArrayList<Movie> mMovie;
-//    private String mBase_URL = "http://api.themoviedb.org/3/discover/movie?";
-    private String mBase_URL = "http://api.themoviedb.org/3/movie/popular?";
+    private String mBase_URL = "http://api.themoviedb.org/3/discover/movie?";
+//    private String mBase_URL = "http://api.themoviedb.org/3/movie/popular?";
     private String mSort = null;
-    private String mApi_key = "&api_key=d6626beaba59a880217224dd4bb2c98d";
+    private String mApi_key = "&api_key=" + BuildConfig.MOVIES_TMDB_API_KEY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,8 +177,8 @@ public class MainActivity extends ActionBarActivity {
                 String desc = post.optString("overview");
                 String rating = post.optString("vote_average");
                 String votes = post.optString("vote_count");
-                System.out.println("===---===-------------==========vote_average是"+ rating);
-                System.out.println("===---===-------------==========votes是"+ votes);
+
+
 
 
                 movie = new Movie();
@@ -190,7 +190,6 @@ public class MainActivity extends ActionBarActivity {
                 movie.setVotes(votes);
 
                 mMovie.add(movie);
-                System.out.println("--------------------mMovie是" + mMovie);
             }
         } catch (JSONException e) {
             e.printStackTrace();
