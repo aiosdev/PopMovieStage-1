@@ -36,7 +36,6 @@ public class MainActivity extends ActionBarActivity {
     private GridViewAdapter mGridAdapter;
     private ArrayList<Movie> mMovie;
     private String mBase_URL = "http://api.themoviedb.org/3/discover/movie?";
-//    private String mBase_URL = "http://api.themoviedb.org/3/movie/popular?";
     private String mSort = null;
     private String mApi_key = "&api_key=" + BuildConfig.MOVIES_TMDB_API_KEY;
 
@@ -90,13 +89,28 @@ public class MainActivity extends ActionBarActivity {
 //First, clear the adapter. Otherwise, the new movie list gets appended to the old movie list rather than replacing it.
         mGridAdapter.clear();
 
-        AsyncHttpTask movieTask = new AsyncHttpTask();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(prefListener);
+
         mSort = prefs.getString("sort", "sort_by=popularity.desc");
         String fullPath = mBase_URL + mSort + mApi_key;
+
+
+        AsyncHttpTask movieTask = new AsyncHttpTask();
         movieTask.execute(fullPath);
 
     }
+
+    private SharedPreferences.OnSharedPreferenceChangeListener prefListener =
+            new SharedPreferences.OnSharedPreferenceChangeListener(){
+
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+                    if(s.equals("sort")){
+
+                    }
+                }
+            };
 
     @Override
     public void onStart() {

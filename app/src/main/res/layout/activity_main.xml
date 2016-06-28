@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:drawSelectorOnTop="true"
         android:gravity="center"
-        android:numColumns="2"
+        android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
         android:focusable="true"
         android:clickable="true"/>
