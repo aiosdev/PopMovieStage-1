@@ -1,4 +1,4 @@
-package udacity.popmoviestage_1;
+package udacity.popmoviestage_2;
 
 import android.app.Activity;
 import android.content.Context;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="udacity.popmoviestage_1">
+    package="udacity.popmoviestage_2">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name="udacity.popmoviestage_2.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,14 +20,14 @@
         </activity>
 
         <activity
-            android:name=".DetailsActivity" />
+            android:name="udacity.popmoviestage_2.DetailsActivity" />
         <activity
-            android:name=".SettingsActivity"
+            android:name="udacity.popmoviestage_2.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="udacity.popmoviestage_2.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value="udacity.popmoviestage_2.MainActivity"/>
 
 
         </activity>

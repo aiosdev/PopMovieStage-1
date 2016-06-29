@@ -1,4 +1,4 @@
-package udacity.popmoviestage_1;
+package udacity.popmoviestage_2;
 
 /**
 I use this class to store the information for each movie as a movie object. As part of the first Android project
