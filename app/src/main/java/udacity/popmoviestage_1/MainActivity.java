@@ -1,7 +1,10 @@
 package udacity.popmoviestage_1;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -35,9 +38,9 @@ public class MainActivity extends ActionBarActivity {
     private GridView mGridView;
     private GridViewAdapter mGridAdapter;
     private ArrayList<Movie> mMovie;
-    private String mBase_URL = "http://api.themoviedb.org/3/discover/movie?";
+    private String mBase_URL = "http://api.themoviedb.org/3/movie/";
     private String mSort = null;
-    private String mApi_key = "&api_key=" + BuildConfig.MOVIES_TMDB_API_KEY;
+    private String mApi_key = "?api_key=" + BuildConfig.MOVIES_TMDB_API_KEY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +96,7 @@ public class MainActivity extends ActionBarActivity {
 
         mSort = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_default));
         String fullPath = mBase_URL + mSort + mApi_key;
+        System.out.println("++++++---------------====fullPath是" + fullPath);
 
         AsyncHttpTask movieTask = new AsyncHttpTask();
         movieTask.execute(fullPath);
@@ -103,7 +107,18 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onStart() {
         super.onStart();
-        updateMovies();
+        if(isOnline(this)){
+            updateMovies();
+        }else{
+            Toast.makeText(MainActivity.this, "Network isn't avaiable, check connection", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    private boolean isOnline(Context context){
+        ConnectivityManager mngr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = mngr.getActiveNetworkInfo();
+        return !(info == null || (info.getState()) != NetworkInfo.State.CONNECTED);
     }
 
     public void prefChangeUpdate (SharedPreferences sharedPreferences, String key) {
