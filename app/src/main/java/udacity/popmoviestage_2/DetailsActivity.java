@@ -130,13 +130,13 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     private void updateTrailer() {
-        String trailerPath = mBase_URL + id + mVideos + mApi_key;
+        String trailerPath = mBase_URL + id +"/"+ mVideos + mApi_key;
         AsyncTrailerTask trailerTask = new AsyncTrailerTask();
         trailerTask.execute(trailerPath);
     }
 
     private void updateReview() {
-        String reviewPath = mBase_URL + id + mReviews + mApi_key;
+        String reviewPath = mBase_URL + id +"/"+ mReviews + mApi_key;
         AsyncReviewTask reviewTask = new AsyncReviewTask();
         reviewTask.execute(reviewPath);
     }
@@ -222,7 +222,10 @@ public class DetailsActivity extends AppCompatActivity {
                 int status = httpResponse.getStatusLine().getStatusCode();
                 if (status == 200) {
                     String response = streamToString(httpResponse.getEntity().getContent());
+                    System.out.println("----------===========reponse"+response);
                     parseReview(response);
+
+
                     result = 1;
                 } else {
                     result = 0;
