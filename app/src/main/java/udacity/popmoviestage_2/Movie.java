@@ -3,7 +3,7 @@ package udacity.popmoviestage_2;
 /**
 I use this class to store the information for each movie as a movie object. As part of the first Android project
 I developed, I thought this a good solution. As I progressed, I learned a better way to store and retrieve information,
-using content loaders in later projects. 
+using content loaders in later projects.
 */
 
 public class Movie {
@@ -13,6 +13,8 @@ public class Movie {
     private String year;
     private String rating;
     private String votes;
+    private String id;
+
 
     public Movie() {super();}
 
@@ -39,5 +41,10 @@ public class Movie {
     public String getVotes(){return votes;}
 
     public void setVotes(String votes){this.votes=votes;}
+
+    public String getId(){return id;}
+
+    public void setId(String id){this.id=id;}
+
 
 }

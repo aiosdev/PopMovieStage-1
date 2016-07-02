@@ -52,7 +52,6 @@ public class MainActivity extends ActionBarActivity {
         mMovie = new ArrayList<>();
         mGridAdapter = new GridViewAdapter(this, R.layout.movie_layout, mMovie);
         mGridView.setAdapter(mGridAdapter);
-        System.out.println("+++++++++++++++++mMovie是"+ mMovie);
 
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -64,7 +63,8 @@ public class MainActivity extends ActionBarActivity {
                         putExtra("year", movie.getYear()).
                         putExtra("description", movie.getDesc()).
                         putExtra("rating", movie.getRating()).
-                        putExtra("votes", movie.getVotes());
+                        putExtra("votes", movie.getVotes()).
+                        putExtra("id", movie.getId());
                 startActivity(intent);
             }
         });
@@ -96,8 +96,6 @@ public class MainActivity extends ActionBarActivity {
 
         mSort = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_default));
         String fullPath = mBase_URL + mSort + mApi_key;
-        System.out.println("++++++---------------====fullPath是" + fullPath);
-
         AsyncHttpTask movieTask = new AsyncHttpTask();
         movieTask.execute(fullPath);
 
@@ -110,9 +108,8 @@ public class MainActivity extends ActionBarActivity {
         if(isOnline(this)){
             updateMovies();
         }else{
-            Toast.makeText(MainActivity.this, "Network isn't avaiable, check connection", Toast.LENGTH_LONG).show();
+            Toast.makeText(MainActivity.this, "Network isn't available, check connection", Toast.LENGTH_LONG).show();
         }
-
     }
 
     private boolean isOnline(Context context){
@@ -136,9 +133,7 @@ public class MainActivity extends ActionBarActivity {
             try {
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpResponse httpResponse = httpclient.execute(new HttpGet(params[0]));
-                System.out.println("============--------------httpResponse是"+ httpResponse);
                 int status = httpResponse.getStatusLine().getStatusCode();
-                System.out.println("============status是" + status);
                 if (status == 200) {
                     String response = streamToString(httpResponse.getEntity().getContent());
                     parseResult(response);
@@ -194,8 +189,7 @@ public class MainActivity extends ActionBarActivity {
                 String desc = post.optString("overview");
                 String rating = post.optString("vote_average");
                 String votes = post.optString("vote_count");
-
-
+                String id = post.optString("id");
 
 
                 movie = new Movie();
@@ -205,6 +199,7 @@ public class MainActivity extends ActionBarActivity {
                 movie.setRating(rating);
                 movie.setImage(fullPosterPath);
                 movie.setVotes(votes);
+                movie.setId(id);
 
                 mMovie.add(movie);
             }
