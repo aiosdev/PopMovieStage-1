@@ -49,7 +49,7 @@ public class ReviewAdapter extends ArrayAdapter<Review> {
         Review review = mReview.get(position);
         holder.ReviewAuthor.setText(review.getAuthor());
         holder.ReviewContent.setText(review.getReview());
-
+        System.out.println("----------------------review是" + review.getReview());
         return view;
     }
 
