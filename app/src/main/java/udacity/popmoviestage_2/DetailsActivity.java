@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -112,6 +113,7 @@ public class DetailsActivity extends AppCompatActivity {
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key));
                     startActivity(intent);
+                    Toast.makeText(getApplicationContext(), "Being launched by YouTube", Toast.LENGTH_LONG).show();
                 } catch (ActivityNotFoundException ex) {
                     Intent intent = new Intent(Intent.ACTION_VIEW,
                             Uri.parse("http://www.youtube.com/watch?v=" + key));
@@ -216,13 +218,14 @@ public class DetailsActivity extends AppCompatActivity {
                     JSONObject post = posts.optJSONObject(i);
                     String trailerName = post.optString("name");
                     key = post.optString("key");
-                    int videoTotal = posts.length();
 
                     trailer = new Video();
                     trailer.setKey(key);
                     trailer.setTrailerName(trailerName);
 
                     mVideo.add(trailer);
+                    System.out.println("===---===----===---mVideo是" + mVideo.get(i));
+                    System.out.println("===---===----===---trailer是" + trailer);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
