@@ -1,7 +1,9 @@
 package udacity.popmoviestage_2;
 
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -9,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -53,6 +57,7 @@ public class DetailsActivity extends AppCompatActivity {
     private String mVideos = "videos";
     private String mReviews = "reviews";
     private String id = null;
+    private String key = null;
 
 
     @Override
@@ -101,7 +106,19 @@ public class DetailsActivity extends AppCompatActivity {
         mVideoAdapter = new VideoAdapter(this, R.layout.video_layout, mVideo);
         lvVideo.setAdapter(mVideoAdapter);
 
-        //TODO
+        lvVideo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key));
+                    startActivity(intent);
+                } catch (ActivityNotFoundException ex) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("http://www.youtube.com/watch?v=" + key));
+                    startActivity(intent);
+                }
+            }
+        });
 
     }
 
@@ -133,6 +150,8 @@ public class DetailsActivity extends AppCompatActivity {
         String trailerPath = mBase_URL + id +"/"+ mVideos + mApi_key;
         AsyncTrailerTask trailerTask = new AsyncTrailerTask();
         trailerTask.execute(trailerPath);
+        System.out.println("============--------------=======path" + trailerPath);
+
     }
 
     private void updateReview() {
@@ -191,11 +210,12 @@ public class DetailsActivity extends AppCompatActivity {
             try {
                 JSONObject response = new JSONObject(result);
                 JSONArray posts = response.optJSONArray("results");
+                System.out.println("---------------------reponse是" + response.toString());
                 Video trailer;
                 for (int i = 0; i < posts.length(); i++) {
                     JSONObject post = posts.optJSONObject(i);
                     String trailerName = post.optString("name");
-                    String key = post.optString("key");
+                    key = post.optString("key");
                     int videoTotal = posts.length();
 
                     trailer = new Video();
