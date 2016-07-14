@@ -102,7 +102,6 @@
 
 
         <ListView
-
             android:id="@+id/lv_video"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
