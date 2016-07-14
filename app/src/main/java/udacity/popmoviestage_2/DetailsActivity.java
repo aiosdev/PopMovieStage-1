@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -47,6 +48,7 @@ public class DetailsActivity extends AppCompatActivity {
     private TextView voteTextView;
     private ListView lvVideo;
     private ListView lvReview;
+    private Button favoriteButton;
 
     private ArrayList<Review> mReview;
     private ArrayList<Video> mVideo;
@@ -60,6 +62,7 @@ public class DetailsActivity extends AppCompatActivity {
     private String id = null;
     private String key = null;
 
+    private String response = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +71,6 @@ public class DetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_details_view);
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
-
 
         Bundle bundle = getIntent().getExtras();
 
@@ -91,6 +93,16 @@ public class DetailsActivity extends AppCompatActivity {
         ratingBar.setText(rating + " / " + "10");
         voteTextView = (TextView) findViewById(R.id.votes);
         voteTextView.setText(votes + " votes");
+        favoriteButton = (Button) findViewById(R.id.bt_favorite);
+        favoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO
+            }
+        });
+
+        updateReview();
+        updateTrailer();
 
         imageView = (ImageView) findViewById(R.id.imageView);
         Picasso.with(this).load(image).placeholder(R.drawable.loader).into(imageView);
@@ -127,8 +139,7 @@ public class DetailsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        updateReview();
-        updateTrailer();
+
     }
 
 
@@ -207,31 +218,30 @@ public class DetailsActivity extends AppCompatActivity {
             mVideoAdapter.setVideo(mVideo);
         }
 
+    }
 
-        private void parseTrailer(String result) {
-            try {
-                JSONObject response = new JSONObject(result);
-                JSONArray posts = response.optJSONArray("results");
-                System.out.println("---------------------reponse是" + response.toString());
-                Video trailer;
-                for (int i = 0; i < posts.length(); i++) {
-                    JSONObject post = posts.optJSONObject(i);
-                    String trailerName = post.optString("name");
-                    key = post.optString("key");
+    private void parseTrailer(String result) {
+        try {
+            JSONObject response = new JSONObject(result);
+            JSONArray posts = response.optJSONArray("results");
+            System.out.println("---------------------reponse是" + response.toString());
+            Video trailer;
+            for (int i = 0; i < posts.length(); i++) {
+                JSONObject post = posts.optJSONObject(i);
+                String trailerName = post.optString("name");
+                key = post.optString("key");
 
-                    trailer = new Video();
-                    trailer.setKey(key);
-                    trailer.setTrailerName(trailerName);
+                trailer = new Video();
+                trailer.setKey(key);
+                trailer.setTrailerName(trailerName);
 
-                    mVideo.add(trailer);
-                    System.out.println("===---===----===---mVideo是" + mVideo.get(i));
-                    System.out.println("===---===----===---trailer是" + trailer);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+                mVideo.add(trailer);
+                System.out.println("===---===----===---mVideo是" + mVideo.size());
+                System.out.println("===---===----===---trailer是" + trailer);
             }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-
     }
 
     public class AsyncReviewTask extends AsyncTask<String, Void, Integer> {
@@ -247,7 +257,6 @@ public class DetailsActivity extends AppCompatActivity {
                     String response = streamToString(httpResponse.getEntity().getContent());
                     System.out.println("----------===========reponse"+response);
                     parseReview(response);
-
 
                     result = 1;
                 } else {
@@ -266,28 +275,31 @@ public class DetailsActivity extends AppCompatActivity {
         protected void onPostExecute(Integer integer) {
             mReviewAdapter.setReview(mReview);
         }
+    }
+
+    private void parseReview(String result) {
+        try {
+            JSONObject response = new JSONObject(result);
+            JSONArray posts = response.optJSONArray("results");
+            Review review;
+            for (int i = 0; i < posts.length(); i++) {
+                JSONObject post = posts.optJSONObject(i);
+                String author = post.optString("author");
+                String content = post.optString("content");
+//                String author = post.get("author").toString();
+//                String content = post.get("content").toString();
+                System.out.println("--===---===---===内容是" + content);
 
 
-        private void parseReview(String result) {
-            try {
-                JSONObject response = new JSONObject(result);
-                JSONArray posts = response.optJSONArray("results");
-                Review review;
-                for (int i = 0; i < posts.length(); i++) {
-                    JSONObject post = posts.optJSONObject(i);
-                    String author = post.optString("author");
-                    String content = post.optString("content");
-                    int reviewTotal = posts.length();
+                review = new Review();
+                review.setAuthor(author);
+                review.setReview(content);
 
-                    review = new Review();
-                    review.setAuthor(author);
-                    review.setReview(content);
-
-                    mReview.add(review);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+                mReview.add(review);
+                System.out.println("--------------==============review是 " + mReview.size());
             }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -30,22 +30,28 @@ public class ReviewAdapter extends ArrayAdapter<Review> {
         notifyDataSetChanged();
     }
 
+    @Override
+    public int getCount() {
+
+        return mReview.size();
+    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         ViewHolder holder;
 
-        if(view == null){
-            LayoutInflater inflater = ((Activity)context).getLayoutInflater();
+        if(view == null) {
+            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             view = inflater.inflate(resource, parent, false);
             holder = new ViewHolder();
             holder.ReviewAuthor = (TextView) view.findViewById(R.id.author);
             holder.ReviewContent = (TextView) view.findViewById(R.id.content);
             view.setTag(holder);
-        }else{
-            holder = (ViewHolder) view.getTag();
         }
+
+        holder = (ViewHolder) view.getTag();
+
         Review review = mReview.get(position);
         holder.ReviewAuthor.setText(review.getAuthor());
         holder.ReviewContent.setText(review.getReview());
@@ -56,5 +62,15 @@ public class ReviewAdapter extends ArrayAdapter<Review> {
     private class ViewHolder {
         TextView ReviewAuthor;
         TextView ReviewContent;
+    }
+
+    @Override
+    public Review getItem(int position) {
+        return mReview.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 }
