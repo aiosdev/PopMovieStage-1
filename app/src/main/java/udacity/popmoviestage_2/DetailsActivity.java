@@ -19,6 +19,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
 
 import org.apache.http.HttpResponse;
@@ -35,9 +40,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 
 public class DetailsActivity extends AppCompatActivity {
@@ -106,13 +108,30 @@ public class DetailsActivity extends AppCompatActivity {
 
         mReview = new ArrayList<>();
 
-        try{
-        updateReview();
-        Toast.makeText(DetailsActivity.this, "" + mReview.size(), Toast.LENGTH_LONG).show();
+        String reviewPath = mBase_URL + id + "/" + mReviews + mApi_key;
+        StringRequest stringRequest = new StringRequest(reviewPath,
+                new Response.Listener<String>() {
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+                    @Override
+                    public void onResponse(String response) {
+                        parseReview(response);
+                    Toast.makeText(DetailsActivity.this, "" + mReview.size(), Toast.LENGTH_LONG).show();
+
+                    }},
+
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            //loading.dismiss();
+                        }
+                    });
+        //Adding the request to request queue
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        requestQueue.add(stringRequest);
+//        updateReview();
+//        Toast.makeText(DetailsActivity.this, "" + mReview.size(), Toast.LENGTH_LONG).show();
+
+
         updateTrailer();
 
         System.out.println("...............mreview大小" + mReview.size());
@@ -182,10 +201,10 @@ public class DetailsActivity extends AppCompatActivity {
 
     private void updateReview() throws IOException {
         String reviewPath = mBase_URL + id + "/" + mReviews + mApi_key;
-        OkHttp reviewTask = new OkHttp();
-        String response = reviewTask.run(reviewPath);
-        parseReview(response);
-        System.out.println("000000000000");
+//         reviewTask = new OkHttp();
+//        String response = reviewTask.run(reviewPath);
+//        parseReview(response);
+//        System.out.println("000000000000");
     }
 
     String streamToString(InputStream stream) throws IOException {
@@ -294,21 +313,10 @@ public class DetailsActivity extends AppCompatActivity {
 
 
 
-    public class OkHttp {
 
 
-        OkHttpClient client = new OkHttpClient();
 
-        String run(String url) throws IOException {
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
 
-            try (Response response = client.newCall(request).execute()) {
-                return response.body().string();
-            }
-        }
-    }
 
         private void parseReview(String result) {
             try {
