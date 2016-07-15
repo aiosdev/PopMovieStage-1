@@ -50,6 +50,7 @@ public class MainActivity extends ActionBarActivity {
         mGridView = (GridView) findViewById(R.id.gridView);
 
         mMovie = new ArrayList<>();
+        System.out.println("3333333333333333333mmoviesize是"+ mMovie.size());
         mGridAdapter = new GridViewAdapter(this, R.layout.movie_layout, mMovie);
         mGridView.setAdapter(mGridAdapter);
 
@@ -99,6 +100,7 @@ public class MainActivity extends ActionBarActivity {
         AsyncHttpTask movieTask = new AsyncHttpTask();
         movieTask.execute(fullPath);
 
+
     }
 
 
@@ -107,6 +109,7 @@ public class MainActivity extends ActionBarActivity {
         super.onStart();
         if(isOnline(this)){
             updateMovies();
+            Toast.makeText(MainActivity.this, ""+mMovie.size(), Toast.LENGTH_LONG).show();
         }else{
             Toast.makeText(MainActivity.this, "Network isn't available, check connection", Toast.LENGTH_LONG).show();
         }

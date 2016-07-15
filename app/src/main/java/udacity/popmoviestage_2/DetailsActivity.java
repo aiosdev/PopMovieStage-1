@@ -35,6 +35,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 
 public class DetailsActivity extends AppCompatActivity {
 
@@ -62,7 +66,6 @@ public class DetailsActivity extends AppCompatActivity {
     private String id = null;
     private String key = null;
 
-    private String response = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,16 +104,26 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
 
+        mReview = new ArrayList<>();
+
+        try{
         updateReview();
+        Toast.makeText(DetailsActivity.this, "" + mReview.size(), Toast.LENGTH_LONG).show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         updateTrailer();
+
+        System.out.println("...............mreview大小" + mReview.size());
 
         imageView = (ImageView) findViewById(R.id.imageView);
         Picasso.with(this).load(image).placeholder(R.drawable.loader).into(imageView);
 
         lvReview = (ListView) findViewById(R.id.lv_review);
-        mReview = new ArrayList<>();
         mReviewAdapter = new ReviewAdapter(this, R.layout.review_layout, mReview);
         lvReview.setAdapter(mReviewAdapter);
+
 
         //TODO
 
@@ -160,17 +173,19 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     private void updateTrailer() {
-        String trailerPath = mBase_URL + id +"/"+ mVideos + mApi_key;
+        String trailerPath = mBase_URL + id + "/" + mVideos + mApi_key;
         AsyncTrailerTask trailerTask = new AsyncTrailerTask();
         trailerTask.execute(trailerPath);
         System.out.println("============--------------=======path" + trailerPath);
 
     }
 
-    private void updateReview() {
-        String reviewPath = mBase_URL + id +"/"+ mReviews + mApi_key;
-        AsyncReviewTask reviewTask = new AsyncReviewTask();
-        reviewTask.execute(reviewPath);
+    private void updateReview() throws IOException {
+        String reviewPath = mBase_URL + id + "/" + mReviews + mApi_key;
+        OkHttp reviewTask = new OkHttp();
+        String response = reviewTask.run(reviewPath);
+        parseReview(response);
+        System.out.println("000000000000");
     }
 
     String streamToString(InputStream stream) throws IOException {
@@ -212,7 +227,6 @@ public class DetailsActivity extends AppCompatActivity {
             return result;
         }
 
-
         @Override
         protected void onPostExecute(Integer integer) {
             mVideoAdapter.setVideo(mVideo);
@@ -244,62 +258,81 @@ public class DetailsActivity extends AppCompatActivity {
         }
     }
 
-    public class AsyncReviewTask extends AsyncTask<String, Void, Integer> {
+//    public class AsyncReviewTask extends AsyncTask<String, Void, Integer> {
+//
+//        @Override
+//        protected Integer doInBackground(String... strings) {
+//            Integer result = 0;
+//            try {
+//                HttpClient httpclient = new DefaultHttpClient();
+//                HttpResponse httpResponse = httpclient.execute(new HttpGet(strings[0]));
+//                int status = httpResponse.getStatusLine().getStatusCode();
+//                if (status == 200) {
+//                    String response = streamToString(httpResponse.getEntity().getContent());
+//                    System.out.println("----------===========reponse"+response);
+//                    parseReview(response);
+//                    System.out.println("```````````==========mReview大小是" + mReview.size());
+//
+//                    result = 1;
+//                } else {
+//                    result = 0;
+//                }
+//            } catch (Exception e) {
+////                Log.d(LOG_TAG,"" + e.getLocalizedMessage());
+//                e.printStackTrace();
+//
+//            }
+//
+//            return result;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Integer integer) {
+//            mReviewAdapter.setReview(mReview);
+//        }
+//    }
 
-        @Override
-        protected Integer doInBackground(String... strings) {
-            Integer result = 0;
-            try {
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpResponse httpResponse = httpclient.execute(new HttpGet(strings[0]));
-                int status = httpResponse.getStatusLine().getStatusCode();
-                if (status == 200) {
-                    String response = streamToString(httpResponse.getEntity().getContent());
-                    System.out.println("----------===========reponse"+response);
-                    parseReview(response);
 
-                    result = 1;
-                } else {
-                    result = 0;
-                }
-            } catch (Exception e) {
-//                Log.d(LOG_TAG,"" + e.getLocalizedMessage());
-                e.printStackTrace();
 
+    public class OkHttp {
+
+
+        OkHttpClient client = new OkHttpClient();
+
+        String run(String url) throws IOException {
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+
+            try (Response response = client.newCall(request).execute()) {
+                return response.body().string();
             }
-
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(Integer integer) {
-            mReviewAdapter.setReview(mReview);
         }
     }
 
-    private void parseReview(String result) {
-        try {
-            JSONObject response = new JSONObject(result);
-            JSONArray posts = response.optJSONArray("results");
-            Review review;
-            for (int i = 0; i < posts.length(); i++) {
-                JSONObject post = posts.optJSONObject(i);
-                String author = post.optString("author");
-                String content = post.optString("content");
+        private void parseReview(String result) {
+            try {
+                JSONObject response = new JSONObject(result);
+                JSONArray posts = response.optJSONArray("results");
+                Review review;
+                for (int i = 0; i < posts.length(); i++) {
+                    JSONObject post = posts.optJSONObject(i);
+                    String author = post.optString("author");
+                    String content = post.optString("content");
 //                String author = post.get("author").toString();
 //                String content = post.get("content").toString();
-                System.out.println("--===---===---===内容是" + content);
+                    System.out.println("--===---===---===内容是" + content);
 
 
-                review = new Review();
-                review.setAuthor(author);
-                review.setReview(content);
+                    review = new Review();
+                    review.setAuthor(author);
+                    review.setReview(content);
 
-                mReview.add(review);
-                System.out.println("--------------==============review是 " + mReview.size());
+                    mReview.add(review);
+                    System.out.println("--------------==============review是 " + mReview.size());
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
     }
-}

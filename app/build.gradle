@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "udacity.popmoviestage_1"
-        minSdkVersion 12
+        minSdkVersion 19
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
@@ -32,4 +32,6 @@ dependencies {
     compile 'org.apache.httpcomponents:httpcore:4.4.1'
     compile 'org.apache.httpcomponents:httpclient:4.5'
     compile 'com.ms-square:expandableTextView:0.1.4'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'org.zarroboogs.http:async-http-request:0.1.8'
 }

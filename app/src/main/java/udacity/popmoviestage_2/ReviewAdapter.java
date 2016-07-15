@@ -23,6 +23,8 @@ public class ReviewAdapter extends ArrayAdapter<Review> {
         this.context = context;
         this.resource = resource;
         this.mReview = mReview;
+
+        System.out.println("~~~~~~~~~~~~~~~~mReviews是" + mReview.size());
     }
 
     public void setReview(ArrayList<Review> mReview){
