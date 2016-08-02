@@ -2,6 +2,7 @@ package udacity.popmoviestage_2;
 
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -19,11 +20,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.squareup.picasso.Picasso;
 
 import org.apache.http.HttpResponse;
@@ -40,6 +36,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import udacity.popmoviestage_2.data.MovieContract;
 
 
 public class DetailsActivity extends AppCompatActivity {
@@ -68,6 +65,7 @@ public class DetailsActivity extends AppCompatActivity {
     private String id = null;
     private String key = null;
 
+    private String title = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +77,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
 
-        String title = bundle.getString("title");
+        title = bundle.getString("title");
         String image = bundle.getString("image");
         String desc = bundle.getString("description");
         String year = bundle.getString("year");
@@ -103,36 +101,38 @@ public class DetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //TODO
+//                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+////                prefs.edit().putString(getString(R.string.pref_sort_fav), title).apply();
+//                prefs.edit().putString(getString(R.string.pref_sort_fav), id).apply();
+                toggleMovieFavorite();
+                Toast.makeText(getApplicationContext(), "Marked as favorite", Toast.LENGTH_LONG).show();
             }
         });
 
         mReview = new ArrayList<>();
 
-        String reviewPath = mBase_URL + id + "/" + mReviews + mApi_key;
-        StringRequest stringRequest = new StringRequest(reviewPath,
-                new Response.Listener<String>() {
-
-                    @Override
-                    public void onResponse(String response) {
-                        parseReview(response);
-                    Toast.makeText(DetailsActivity.this, "" + mReview.size(), Toast.LENGTH_LONG).show();
-
-                    }},
-
-                    new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            //loading.dismiss();
-                        }
-                    });
-        //Adding the request to request queue
-        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        requestQueue.add(stringRequest);
-//        updateReview();
+//        String reviewPath = mBase_URL + id + "/" + mReviews + mApi_key;
+//        StringRequest stringRequest = new StringRequest(reviewPath,
+//                new Response.Listener<String>() {
+//
+//                    @Override
+//                    public void onResponse(String response) {
+//                        parseReview(response);
+//                    Toast.makeText(DetailsActivity.this, "" + mReview.size(), Toast.LENGTH_LONG).show();
+//
+//                    }},
+//
+//                    new Response.ErrorListener() {
+//                        @Override
+//                        public void onErrorResponse(VolleyError error) {
+//                            //loading.dismiss();
+//                        }
+//                    });
+//        //Adding the request to request queue
+//        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+//        requestQueue.add(stringRequest);
 //        Toast.makeText(DetailsActivity.this, "" + mReview.size(), Toast.LENGTH_LONG).show();
 
-
-        updateTrailer();
 
         System.out.println("...............mreview大小" + mReview.size());
 
@@ -142,7 +142,7 @@ public class DetailsActivity extends AppCompatActivity {
         lvReview = (ListView) findViewById(R.id.lv_review);
         mReviewAdapter = new ReviewAdapter(this, R.layout.review_layout, mReview);
         lvReview.setAdapter(mReviewAdapter);
-
+//        setReviewListViewHeightBasedOnChildren(lvReview);
 
         //TODO
 
@@ -171,13 +171,15 @@ public class DetailsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        updateReview();
+        updateTrailer();
 
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.detail, menu);
+        getMenuInflater().inflate(R.menu.menu_detail, menu);
         return true;
     }
 
@@ -199,12 +201,10 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
-    private void updateReview() throws IOException {
+    private void updateReview() {
         String reviewPath = mBase_URL + id + "/" + mReviews + mApi_key;
-//         reviewTask = new OkHttp();
-//        String response = reviewTask.run(reviewPath);
-//        parseReview(response);
-//        System.out.println("000000000000");
+        AsyncReviewTask reviewTask = new AsyncReviewTask();
+        reviewTask.execute(reviewPath);
     }
 
     String streamToString(InputStream stream) throws IOException {
@@ -277,70 +277,87 @@ public class DetailsActivity extends AppCompatActivity {
         }
     }
 
-//    public class AsyncReviewTask extends AsyncTask<String, Void, Integer> {
-//
-//        @Override
-//        protected Integer doInBackground(String... strings) {
-//            Integer result = 0;
-//            try {
-//                HttpClient httpclient = new DefaultHttpClient();
-//                HttpResponse httpResponse = httpclient.execute(new HttpGet(strings[0]));
-//                int status = httpResponse.getStatusLine().getStatusCode();
-//                if (status == 200) {
-//                    String response = streamToString(httpResponse.getEntity().getContent());
-//                    System.out.println("----------===========reponse"+response);
-//                    parseReview(response);
-//                    System.out.println("```````````==========mReview大小是" + mReview.size());
-//
-//                    result = 1;
-//                } else {
-//                    result = 0;
-//                }
-//            } catch (Exception e) {
-////                Log.d(LOG_TAG,"" + e.getLocalizedMessage());
-//                e.printStackTrace();
-//
-//            }
-//
-//            return result;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Integer integer) {
-//            mReviewAdapter.setReview(mReview);
-//        }
-//    }
+    public class AsyncReviewTask extends AsyncTask<String, Void, Integer> {
 
-
-
-
-
-
-
-
-        private void parseReview(String result) {
+        @Override
+        protected Integer doInBackground(String... strings) {
+            Integer result = 0;
             try {
-                JSONObject response = new JSONObject(result);
-                JSONArray posts = response.optJSONArray("results");
-                Review review;
-                for (int i = 0; i < posts.length(); i++) {
-                    JSONObject post = posts.optJSONObject(i);
-                    String author = post.optString("author");
-                    String content = post.optString("content");
-//                String author = post.get("author").toString();
-//                String content = post.get("content").toString();
-                    System.out.println("--===---===---===内容是" + content);
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpResponse httpResponse = httpclient.execute(new HttpGet(strings[0]));
+                int status = httpResponse.getStatusLine().getStatusCode();
+                if (status == 200) {
+                    String response = streamToString(httpResponse.getEntity().getContent());
+                    System.out.println("----------===========reponse" + response);
+                    parseReview(response);
+                    System.out.println("```````````==========mReview大小是" + mReview.size());
 
-
-                    review = new Review();
-                    review.setAuthor(author);
-                    review.setReview(content);
-
-                    mReview.add(review);
-                    System.out.println("--------------==============review是 " + mReview.size());
+                    result = 1;
+                } else {
+                    result = 0;
                 }
-            } catch (JSONException e) {
+            } catch (Exception e) {
+//                Log.d(LOG_TAG,"" + e.getLocalizedMessage());
                 e.printStackTrace();
+
             }
+
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            mReviewAdapter.setReview(mReview);
         }
     }
+
+    private void parseReview(String result) {
+        try {
+            JSONObject response = new JSONObject(result);
+            JSONArray posts = response.optJSONArray("results");
+            Review review;
+            for (int i = 0; i < posts.length(); i++) {
+                JSONObject post = posts.optJSONObject(i);
+                String author = post.optString("author");
+                String content = post.optString("content");
+                System.out.println("--===---===---===内容是" + content);
+
+
+                review = new Review();
+                review.setAuthor(author);
+                review.setReview(content);
+
+                mReview.add(review);
+                System.out.println("--------------==============review是 " + mReview.size());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+//    private void setReviewListViewHeightBasedOnChildren(ListView lvReview) {
+//
+//        ReviewAdapter mReviewAdapter = (ReviewAdapter) lvReview.getAdapter();
+//        if (mReviewAdapter == null) {
+//            return;
+//        }
+//
+//        int totalHeight = 0;
+//        for (int i = 0; i < mReviewAdapter.getCount(); i++) {
+//            View listItem = mReviewAdapter.getView(i, null, lvReview);
+//            listItem.measure(0, 0);
+//            totalHeight += listItem.getMeasuredHeight();
+//        }
+//
+//
+//        ViewGroup.LayoutParams params = lvReview.getLayoutParams();
+//        params.height = totalHeight
+//                + (lvReview.getDividerHeight() * (mReviewAdapter.getCount() - 1));
+//        lvReview.setLayoutParams(params);
+//    }
+
+    private void toggleMovieFavorite(){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MovieContract.MovieEntry.COLUMN_);
+    }
+}

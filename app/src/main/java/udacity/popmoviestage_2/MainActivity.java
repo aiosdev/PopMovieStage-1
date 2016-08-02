@@ -42,6 +42,8 @@ public class MainActivity extends ActionBarActivity {
     private String mSort = null;
     private String mApi_key = "?api_key=" + BuildConfig.MOVIES_TMDB_API_KEY;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +52,6 @@ public class MainActivity extends ActionBarActivity {
         mGridView = (GridView) findViewById(R.id.gridView);
 
         mMovie = new ArrayList<>();
-        System.out.println("3333333333333333333mmoviesize是"+ mMovie.size());
         mGridAdapter = new GridViewAdapter(this, R.layout.movie_layout, mMovie);
         mGridView.setAdapter(mGridAdapter);
 
@@ -69,6 +70,7 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(intent);
             }
         });
+
     }
 
     @Override
@@ -90,17 +92,14 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void updateMovies() {
-//First, clear the adapter. Otherwise, the new movie list gets appended to the old movie list rather than replacing it.
         mGridAdapter.clear();
-
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         mSort = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_default));
         String fullPath = mBase_URL + mSort + mApi_key;
         AsyncHttpTask movieTask = new AsyncHttpTask();
         movieTask.execute(fullPath);
-
-
+        System.out.println("4444444444444444fullpath是" + fullPath);
     }
 
 
@@ -109,7 +108,6 @@ public class MainActivity extends ActionBarActivity {
         super.onStart();
         if(isOnline(this)){
             updateMovies();
-            Toast.makeText(MainActivity.this, ""+mMovie.size(), Toast.LENGTH_LONG).show();
         }else{
             Toast.makeText(MainActivity.this, "Network isn't available, check connection", Toast.LENGTH_LONG).show();
         }

@@ -16,40 +16,141 @@
 package udacity.popmoviestage_2.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 public class MovieProvider extends ContentProvider {
 
-    // The URI Matcher used by this content provider.
-    private static final UriMatcher sUriMatcher = buildUriMatcher();
-    private MovieDbHelper mOpenHelper;
+    private static final String TAG = MovieProvider.class.getSimpleName();
 
-    static final int MOVIE = 100;
+    private static final UriMatcher uriMatcher = buildUriMatcher();
+    private MovieDbHelper dbHelper;
 
-    /*
-        Students: Here is where you need to create the UriMatcher. This UriMatcher will
-        match each URI to the WEATHER, WEATHER_WITH_LOCATION, WEATHER_WITH_LOCATION_AND_DATE,
-        and LOCATION integer constants defined above.  You can test this by uncommenting the
-        testUriMatcher test within TestUriMatcher.
-     */
+    private static final int MOVIES = 100;
+    private static final int MOVIE_WITH_ID = 101;
+    private static final int TRAILERS = 200;
+    private static final int REVIEWS = 300;
+
+    private static SQLiteQueryBuilder movieQueryBuilder;
+    private static SQLiteQueryBuilder trailerByMovieQueryBuilder;
+    private static SQLiteQueryBuilder reviewByMovieQueryBuilder;
+
+    public class C{
+        public static final String MOVIE_DATABASE_NAME = "popmovie.db";
+
+        public static final String API_KEY_QUERY_PARAM = "api_key";
+        public static final String THE_MOVIE_DB_BASE_URL = "http://api.themoviedb.org";
+        public static final String POSTER_IMAGE_BASE_URL = "http://image.tmdb.org/t/p/w500";
+        public static final String BACKDROP_IMAGE_BASE_URL = "http://image.tmdb.org/t/p/original";
+        public static final String YOUTUBE_VIDEO_URL = "https://www.youtube.com/watch?v=";
+
+        public static final String YOUTUBE_VIDEO_THUMBNAIL = "http://img.youtube.com/vi/";
+        public static final String YOUTUBE_VIDEO_THUMBNAIL_FILE_NAME = "/default.jpg";
+
+        public static final String YOUTUBE_FORCE_FULLSCREEN = "force_fullscreen";
+
+        public static final String MOVIE_PARCEL = "MOVIE_PARCEL";
+        public static final String MOVIE_FILTER = "MOVIE_FILTER";
+
+        public static final String[] SELECT_ALL_COLUMNS = new String[]{"*"};
+    }
+
+    static {
+        movieQueryBuilder = new SQLiteQueryBuilder();
+        movieQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
+
+        trailerByMovieQueryBuilder = new SQLiteQueryBuilder();
+        trailerByMovieQueryBuilder.setTables(MovieContract.TrailerEntry.TABLE_NAME);
+
+        reviewByMovieQueryBuilder = new SQLiteQueryBuilder();
+        reviewByMovieQueryBuilder.setTables(MovieContract.ReviewEntry.TABLE_NAME);
+    }
+
+    public static String movieByKeySelection = MovieContract.MovieEntry.TABLE_NAME +
+            "." + MovieContract.MovieEntry.COLUMN_MOVIE_KEY + "=?" ;
+
+    public static String popularMoviesSelection = MovieContract.MovieEntry.TABLE_NAME +
+            "." + MovieContract.MovieEntry.COLUMN_POPULARITY_PAGE_NUMBER + ">0";
+
+
     static UriMatcher buildUriMatcher() {
-        // I know what you're thinking.  Why create a UriMatcher when you can use regular
-        // expressions instead?  Because you're not crazy, that's why.
 
-        // All paths added to the UriMatcher have a corresponding code to return when a match is
-        // found.  The code passed into the constructor represents the code to return for the root
-        // URI.  It's common to use NO_MATCH as the code for this case.
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
 
-        // For each type of URI you want to add, create a corresponding code.
-        matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIE);
+        // GET Movies
+        matcher.addURI(authority, MovieContract.PATH_MOVIES, MOVIES);
+        matcher.addURI(authority, MovieContract.PATH_MOVIES + "/#", MOVIE_WITH_ID);
+
+        matcher.addURI(authority, MovieContract.PATH_TRAILER, TRAILERS);
+        matcher.addURI(authority, MovieContract.PATH_REVIEW, REVIEWS);
+        matcher.addURI(authority, MovieContract.PATH_TRAILER + "/#", TRAILERS);
+        matcher.addURI(authority, MovieContract.PATH_REVIEW + "/#", REVIEWS);
+
 
         return matcher;
+    }
+
+    private Cursor getMovies(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder){
+        return movieQueryBuilder.query(dbHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
+    }
+
+    private Cursor getMovieByKey(Uri uri){
+        String _movieId = String.valueOf(ContentUris.parseId(uri));
+
+        String[] selectionArgs = new String[]{_movieId};
+        String selection = movieByKeySelection;
+
+        return movieQueryBuilder.query(dbHelper.getReadableDatabase(),
+                C.SELECT_ALL_COLUMNS,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null);
+    }
+
+    private Cursor getTrailersByMovie(Uri uri, String[] projection, String sortOrder){
+        String _movieId = String.valueOf(ContentUris.parseId(uri));
+        String[] selectionArgs = new String[]{_movieId};
+        String selection = movieByKeySelection;
+
+        return trailerByMovieQueryBuilder.query(dbHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
+    }
+
+    private Cursor getReviewsByMovie(Uri uri, String[] projection, String sortOrder){
+        String _movieId = String.valueOf(ContentUris.parseId(uri));
+        String[] selectionArgs = new String[]{_movieId};
+        String selection = movieByKeySelection;
+
+        return reviewByMovieQueryBuilder.query(dbHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
     }
 
     /*
@@ -58,7 +159,7 @@ public class MovieProvider extends ContentProvider {
      */
     @Override
     public boolean onCreate() {
-        mOpenHelper = new MovieDbHelper(getContext());
+        dbHelper = new MovieDbHelper(getContext());
         return true;
     }
 
@@ -71,12 +172,18 @@ public class MovieProvider extends ContentProvider {
     public String getType(Uri uri) {
 
         // Use the Uri Matcher to determine what kind of URI this is.
-        final int match = sUriMatcher.match(uri);
+        final int match = uriMatcher.match(uri);
 
         switch (match) {
             // Student: Uncomment and fill out these two cases
-            case MOVIE:
+            case MOVIES:
+                return MovieContract.MovieEntry.CONTENT_DIR_TYPE;
+            case MOVIE_WITH_ID:
                 return MovieContract.MovieEntry.CONTENT_ITEM_TYPE;
+            case TRAILERS:
+                return MovieContract.TrailerEntry.CONTENT_DIR_TYPE;
+            case REVIEWS:
+                return MovieContract.ReviewEntry.CONTENT_DIR_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -87,29 +194,30 @@ public class MovieProvider extends ContentProvider {
                         String sortOrder) {
         // Here's the switch statement that, given a URI, will determine what kind of request it is,
         // and query the database accordingly.
-        Cursor retCursor;
-        switch (sUriMatcher.match(uri)) {
+        Cursor cursor;
+        switch (uriMatcher.match(uri)) {
             // "weather/*/*"
-            case MOVIE:
-            {
-
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        MovieContract.MovieEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
+            case MOVIES:
+                cursor = getMovies(uri, projection, selection, selectionArgs, sortOrder);
                 break;
-            }
-
+            case MOVIE_WITH_ID:
+                cursor = getMovieByKey(uri);
+                break;
+            case TRAILERS:
+                cursor = getTrailersByMovie(uri, projection, sortOrder);
+                break;
+            case REVIEWS:
+                cursor = getReviewsByMovie(uri, projection, sortOrder);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
-        return retCursor;
+
+        Context context = getContext();
+        if(context != null){
+            cursor.setNotificationUri(context.getContentResolver(), uri);
+        }
+        return cursor;
     }
 
     /*
@@ -117,43 +225,76 @@ public class MovieProvider extends ContentProvider {
      */
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final int match = uriMatcher.match(uri);
         Uri returnUri;
 
         switch (match) {
-            case MOVIE: {
+            case MOVIES: {
                 long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
-                if ( _id > 0 )
+                if ( _id > 0 ) {
                     returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
-                else
+                }else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            }
+            case TRAILERS: {
+                long _id = db.insert(MovieContract.TrailerEntry.TABLE_NAME, null, values);
+                if(_id > 0){
+                    returnUri = MovieContract.TrailerEntry.buildTrailerUri(_id);
+                }else {
+                    throw new UnsupportedOperationException("Unable to insert rows into: "+ uri);
+                }
+                break;
+            }
+            case REVIEWS: {
+                long _id = db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, values);
+                if(_id>0){
+                    returnUri = MovieContract.ReviewEntry.buildReviewUri(_id);
+                }else{
+                    throw new UnsupportedOperationException("Unable to insert rows into: "+ uri);
+                }
                 break;
             }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        getContext().getContentResolver().notifyChange(uri, null);
+        Context context = getContext();
+        if (context != null) {
+            context.getContentResolver().notifyChange(uri, null);
+        }
         return returnUri;
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final int match = uriMatcher.match(uri);
         int rowsDeleted;
         // this makes delete all rows return the number of rows deleted
-        if ( null == selection ) selection = "1";
+
         switch (match) {
-            case MOVIE:
+            case MOVIES: {
                 rowsDeleted = db.delete(
                         MovieContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
                 break;
+            }
+            case TRAILERS: {
+                rowsDeleted = db.delete(
+                        MovieContract.TrailerEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
+            case REVIEWS:{
+                rowsDeleted = db.delete(
+                        MovieContract.ReviewEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        // Because a null deletes all rows
-        if (rowsDeleted != 0) {
+        Context context = getContext();
+        if (context != null && rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsDeleted;
@@ -161,23 +302,32 @@ public class MovieProvider extends ContentProvider {
 
 
     @Override
-    public int update(
-            Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final int match = uriMatcher.match(uri);
         int rowsUpdated;
 
         switch (match) {
-            case MOVIE:
-                rowsUpdated = db.update(MovieContract.MovieEntry.TABLE_NAME, values, selection,
-                        selectionArgs);
+            case MOVIES: {
+                rowsUpdated = db.update(MovieContract.MovieEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
+            }
+            case TRAILERS: {
+                rowsUpdated = db.update(MovieContract.TrailerEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            }
+            case REVIEWS: {
+                rowsUpdated = db.update(MovieContract.ReviewEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        if (rowsUpdated != 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+        Context context = getContext();
+        if (context != null && rowsUpdated != 0) {
+            context.getContentResolver().notifyChange(uri, null);
         }
         return rowsUpdated;
     }
+
 }

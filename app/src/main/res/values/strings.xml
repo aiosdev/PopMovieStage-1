@@ -10,13 +10,17 @@
     <string name="pref_sort_label">Sort by</string>
     <string name="pref_sort_label_popular">Popularity</string>
     <string name="pref_sort_label_rating">Rating</string>
+    <string name="pref_sort_label_fav">Favorite</string>
 
     <string name="pref_sort_key" translatable="false">sort</string>
     <string name="pref_sort_default" translatable="false">popular</string>
     <string name="pref_sort_popular" translatable="false">popular</string>
     <string name="pref_sort_rating" translatable="false">top_rated</string>
+    <string name="pref_sort_fav" translatable="false">favorite</string>
 
     <string name="title_activity_movie_detail">MovieDetailActivity</string>
+    <string name="title_item_list">Items</string>
+    <string name="title_item_detail">Item Detail</string>
 
 
 </resources>
