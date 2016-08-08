@@ -6,7 +6,7 @@ android {
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
-        applicationId "udacity.popmoviestage_1"
+        applicationId "udacity.popmoviestage_2"
         minSdkVersion 15
         targetSdkVersion 24
         versionCode 1

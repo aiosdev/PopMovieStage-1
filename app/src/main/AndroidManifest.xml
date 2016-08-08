@@ -43,8 +43,13 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="udacity.popmoviestage_2.ItemListActivity" />
+                android:value="udacity.popmoviestage_2.ItemListActivity"/>
         </activity>
+        <provider
+            android:name=".data.MovieProvider"
+            android:authorities="udacity.popmoviestage_2">
+        </provider>
+
     </application>
 
 </manifest>

@@ -24,7 +24,12 @@ public class GridViewAdapter extends ArrayAdapter<Movie> {
         this.mContext = mContext;
         this.mGridData = mGridData;
     }
-    
+
+    @Override
+    public int getCount() {
+        return mGridData.size();
+    }
+
     public void setGridData(ArrayList<Movie> mGridData) {
         this.mGridData = mGridData;
         notifyDataSetChanged();

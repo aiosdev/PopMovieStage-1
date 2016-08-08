@@ -14,7 +14,7 @@ public class Utility {
         Cursor cursor = context.getContentResolver().query(
                 MovieContract.MovieEntry.CONTENT_URI,
                 null,
-                MovieContract.MovieEntry.COLUMN_MOVIE_ID + " = ?",
+                MovieContract.MovieEntry.COLUMN_MOVIE_KEY + " = ?",
                 new String[]{Integer.toString(id)},
                 null
         );

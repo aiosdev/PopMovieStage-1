@@ -4,6 +4,7 @@ package udacity.popmoviestage_2;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -62,10 +63,17 @@ public class DetailsActivity extends AppCompatActivity {
     private String mApi_key = "?api_key=" + BuildConfig.MOVIES_TMDB_API_KEY;
     private String mVideos = "videos";
     private String mReviews = "reviews";
-    private String id = null;
+
     private String key = null;
 
+    private String id = null;
     private String title = null;
+    private String image = null;
+    private String desc = null;
+    private String year = null;
+    private String rating = null;
+    private String votes = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,11 +86,11 @@ public class DetailsActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
 
         title = bundle.getString("title");
-        String image = bundle.getString("image");
-        String desc = bundle.getString("description");
-        String year = bundle.getString("year");
-        String rating = bundle.getString("rating");
-        String votes = bundle.getString("votes");
+        image = bundle.getString("image");
+        desc = bundle.getString("description");
+        year = bundle.getString("year");
+        rating = bundle.getString("rating");
+        votes = bundle.getString("votes");
         id = bundle.getString("id");
 
         titleTextView = (TextView) findViewById(R.id.title);
@@ -104,7 +112,16 @@ public class DetailsActivity extends AppCompatActivity {
 //                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 ////                prefs.edit().putString(getString(R.string.pref_sort_fav), title).apply();
 //                prefs.edit().putString(getString(R.string.pref_sort_fav), id).apply();
-                toggleMovieFavorite();
+                //toggleMovieFavorite();
+
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(MovieContract.MovieEntry.COLUMN_TITLE, title);
+                contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_KEY,id);
+                contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, image);
+                System.out.println("MovieContract.MovieEntry.COLUMN_TITLE" + title);
+                System.out.println("MovieContract.MovieEntry.COLUMN_MOVIE_KEY" + id);
+                getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
+
                 Toast.makeText(getApplicationContext(), "Marked as favorite", Toast.LENGTH_LONG).show();
             }
         });
@@ -357,7 +374,35 @@ public class DetailsActivity extends AppCompatActivity {
 //    }
 
     private void toggleMovieFavorite(){
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(MovieContract.MovieEntry.COLUMN_);
+        String selection = MovieContract.MovieEntry.COLUMN_MOVIE_KEY + "= '" + id.trim() + "'";
+        if(queryFM(selection)){
+            Toast.makeText(DetailsActivity.this, "This movie is already in favorite folder !", Toast.LENGTH_LONG).show();
+        }else {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MovieContract.MovieEntry.COLUMN_TITLE, title);
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_KEY,id);
+            contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, image);
+            System.out.println("MovieContract.MovieEntry.COLUMN_TITLE" + title);
+            System.out.println("MovieContract.MovieEntry.COLUMN_MOVIE_KEY" + id);
+            getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
+            //String stringUri = MovieContract.BASE_CONTENT_URI.toString() + "/movie";
+            //Uri uri = Uri.parse(stringUri);
+
+            //contentValues.put(MovieContract.MovieEntry.COLUMN_);
+        }
+
+    }
+
+    private boolean queryFM(String selection) {
+        String u = "difiefjie";
+        String columns[] = new String[] {MovieContract.MovieEntry.COLUMN_MOVIE_KEY, MovieContract.MovieEntry.COLUMN_TITLE, MovieContract.MovieEntry.COLUMN_POSTER_PATH };
+        Uri myUri = MovieContract.MovieEntry.CONTENT_URI;
+        //String selection = "123456";//MovieContract.MovieEntry.COLUMN_MOVIE_KEY + "= '" + movieId.trim() + "'";
+        Cursor cur = managedQuery(myUri, columns,selection, null, null );
+        if (cur.moveToFirst()) {
+            return true;
+        }else{
+            return false;
+        }
     }
 }
