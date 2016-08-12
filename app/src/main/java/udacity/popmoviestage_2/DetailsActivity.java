@@ -376,7 +376,7 @@ public class DetailsActivity extends AppCompatActivity {
     private void toggleMovieFavorite(){
         String selection = MovieContract.MovieEntry.COLUMN_MOVIE_KEY + "= '" + id.trim() + "'";
         if(queryFM(selection)){
-            Toast.makeText(DetailsActivity.this, "This movie is already in favorite folder !", Toast.LENGTH_LONG).show();
+            Toast.makeText(DetailsActivity.this, "This movie is already in favirate folder !", Toast.LENGTH_LONG).show();
         }else {
             ContentValues contentValues = new ContentValues();
             contentValues.put(MovieContract.MovieEntry.COLUMN_TITLE, title);
