@@ -40,7 +40,9 @@ import java.util.ArrayList;
 import udacity.popmoviestage_2.data.MovieContract;
 
 
-public class DetailsActivity extends AppCompatActivity {
+public class
+
+DetailsActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = DetailsActivity.class.getSimpleName();
 
@@ -79,7 +81,7 @@ public class DetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_details_view);
+        setContentView(R.layout.activity_detail);
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
 
