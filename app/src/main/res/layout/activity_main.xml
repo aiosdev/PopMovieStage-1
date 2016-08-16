@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:adjustViewBounds="true"
     android:scaleType="fitCenter"
+    android:name="udacity.popmoviestage_2.MainActivityFragment"
     />
 
 

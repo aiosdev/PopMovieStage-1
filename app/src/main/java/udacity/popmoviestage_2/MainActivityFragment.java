@@ -8,7 +8,6 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
-import android.support.v4.app.Fragment;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -35,7 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.zip.Inflater;
 
 /**
  * Created by guoecho on 2016/8/12.
@@ -49,6 +46,9 @@ public class MainActivityFragment extends Fragment {
     private String mBase_URL = "http://api.themoviedb.org/3/movie/";
     private String mSort = null;
     private String mApi_key = "?api_key=" + BuildConfig.MOVIES_TMDB_API_KEY;
+
+    private static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+
 
     public MainActivityFragment() {
 
@@ -68,7 +68,7 @@ public class MainActivityFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        Inflater.inflate(R.menu.menu_grid_view, menu);
+        inflater.inflate(R.menu.menu_grid_view, menu);
     }
 
 //    @Override
@@ -81,7 +81,7 @@ public class MainActivityFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
+            startActivity(new Intent(getActivity(), SettingsActivity.class));
             return true;
         }
 
@@ -97,13 +97,13 @@ public class MainActivityFragment extends Fragment {
         mGridView = (GridView) view.findViewById(R.id.gridView);
 
         mMovie = new ArrayList<>();
-        mGridAdapter = new GridViewAdapter(this, R.layout.fragment_main, mMovie);
+        mGridAdapter = new GridViewAdapter(getActivity(), R.layout.fragment_main, mMovie);
         mGridView.setAdapter(mGridAdapter);
 
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Movie movie = (Movie) parent.getItemAtPosition(position);
-                Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
+                Intent intent = new Intent(getActivity(), DetailsActivity.class);
 
                 intent.putExtra("title", movie.getTitle()).
                         putExtra("image", movie.getImage()).
@@ -122,7 +122,7 @@ public class MainActivityFragment extends Fragment {
 
     public void updateMovies() {
         mGridAdapter.clear();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         mSort = prefs.getString(getString(R.string.pref_sort_key), getString(R.string.pref_sort_default));
         String fullPath = mBase_URL + mSort + mApi_key;
@@ -135,10 +135,10 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (isOnline(this)) {
+        if (isOnline(getActivity())) {
             updateMovies();
         } else {
-            Toast.makeText(MainActivityFragment.this, "Network isn't available, check connection", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Network isn't available, check connection", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -184,7 +184,7 @@ public class MainActivityFragment extends Fragment {
             if (result == 1) {
                 mGridAdapter.setGridData(mMovie);
             } else {
-                Toast.makeText(MainActivity.this, "Failed to get data", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Failed to get data", Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -238,9 +238,5 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
+
 }
