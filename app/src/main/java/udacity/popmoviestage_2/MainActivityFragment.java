@@ -71,7 +71,6 @@ public class MainActivityFragment extends Fragment {
         setHasOptionsMenu(true);
 
 
-
     }
 
     @Override
@@ -79,11 +78,6 @@ public class MainActivityFragment extends Fragment {
         inflater.inflate(R.menu.menu_grid_view, menu);
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        Inflater.inflate(R.menu.menu_grid_view, menu);
-//        return true;
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -125,7 +119,6 @@ public class MainActivityFragment extends Fragment {
 
         return view;
     }
-
 
 
     public void updateMovies() {
@@ -248,10 +241,10 @@ public class MainActivityFragment extends Fragment {
     }
 
     private void queryFavoriteMovies() {
-        String columns[] = new String[] {MovieContract.MovieEntry.COLUMN_MOVIE_KEY, MovieContract.MovieEntry.COLUMN_TITLE, MovieContract.MovieEntry.COLUMN_POSTER_PATH, };
+        String columns[] = new String[]{MovieContract.MovieEntry.COLUMN_MOVIE_KEY, MovieContract.MovieEntry.COLUMN_TITLE, MovieContract.MovieEntry.COLUMN_POSTER_PATH,};
         Uri myUri = MovieContract.MovieEntry.CONTENT_URI;
-        Cursor cur = getActivity().managedQuery(myUri, columns,null, null, null );
-        if(!mFavoriteMovie.isEmpty()){
+        Cursor cur = getActivity().managedQuery(myUri, columns, null, null, null);
+        if (!mFavoriteMovie.isEmpty()) {
             mFavoriteMovie.clear();
         }
 
