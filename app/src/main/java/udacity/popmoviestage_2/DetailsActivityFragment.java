@@ -22,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,12 +81,14 @@ public class DetailsActivityFragment extends Fragment {
     private String rating = null;
     private String votes = null;
 
+    private ScrollView mDetailLayout;
+
     public static final String TAG = DetailsActivityFragment.class.getSimpleName();
     static final String DETAIL_MOVIE = "DETAIL_MOVIE";
 
     private Movie mMovie;
 
-    public DetailsActivityFragment(){
+    public DetailsActivityFragment() {
 
     }
 
@@ -98,8 +101,8 @@ public class DetailsActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        updateReview();
-        updateTrailer();
+        //updateReview();
+        //updateTrailer();
 
     }
 
@@ -124,113 +127,78 @@ public class DetailsActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         Bundle arguments = getArguments();
-        if(arguments != null){
+        if (arguments != null) {
             mMovie = arguments.getParcelable(DetailsActivityFragment.DETAIL_MOVIE);
         }
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
+        mDetailLayout = (ScrollView) rootView.findViewById(R.id.sv_detail_layout);
 
-        Bundle bundle = getIntent().getExtras();
+        if (mMovie != null) {
+            mDetailLayout.setVisibility(View.VISIBLE);
+        } else {
+            mDetailLayout.setVisibility(View.INVISIBLE);
+        }
 
-        title = bundle.getString("title");
-        image = bundle.getString("image");
-        desc = bundle.getString("description");
-        year = bundle.getString("year");
-        rating = bundle.getString("rating");
-        votes = bundle.getString("votes");
-        id = bundle.getString("id");
+        if (mMovie != null) {
+            titleTextView = (TextView) rootView.findViewById(R.id.title);
+            titleTextView.setText(mMovie.getTitle());
+            yearTextView = (TextView) rootView.findViewById(R.id.year);
+            yearTextView.setText(mMovie.getYear());
+            descTextView = (TextView) rootView.findViewById(R.id.desc);
+            descTextView.setText(mMovie.getDesc());
+            descTextView.setMovementMethod(new ScrollingMovementMethod());
+            ratingBar = (TextView) rootView.findViewById(R.id.ratingbar1);
+            ratingBar.setText(mMovie.getRating() + " / " + "10");
+            voteTextView = (TextView) rootView.findViewById(R.id.votes);
+            voteTextView.setText(mMovie.getVotes() + " votes");
 
-        titleTextView = (TextView) rootView.findViewById(R.id.title);
-        titleTextView.setText(title);
-        yearTextView = (TextView) rootView.findViewById(R.id.year);
-        yearTextView.setText(year);
-        descTextView = (TextView) rootView.findViewById(R.id.desc);
-        descTextView.setText(desc);
-        descTextView.setMovementMethod(new ScrollingMovementMethod());
-        ratingBar = (TextView) rootView.findViewById(R.id.ratingbar1);
-        ratingBar.setText(rating + " / " + "10");
-        voteTextView = (TextView) rootView.findViewById(R.id.votes);
-        voteTextView.setText(votes + " votes");
-        favoriteButton = (Button) rootView.findViewById(R.id.bt_favorite);
-        favoriteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //TODO
-//                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-////                prefs.edit().putString(getString(R.string.pref_sort_fav), title).apply();
-//                prefs.edit().putString(getString(R.string.pref_sort_fav), id).apply();
-                //toggleMovieFavorite();
-
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(MovieContract.MovieEntry.COLUMN_TITLE, title);
-                contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_KEY,id);
-                contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, image);
-                System.out.println("MovieContract.MovieEntry.COLUMN_TITLE" + title);
-                System.out.println("MovieContract.MovieEntry.COLUMN_MOVIE_KEY" + id);
-                getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
-
-                Toast.makeText(getContext(), "Marked as favorite", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        mReview = new ArrayList<>();
-
-//        String reviewPath = mBase_URL + id + "/" + mReviews + mApi_key;
-//        StringRequest stringRequest = new StringRequest(reviewPath,
-//                new Response.Listener<String>() {
-//
-//                    @Override
-//                    public void onResponse(String response) {
-//                        parseReview(response);
-//                    Toast.makeText(DetailsActivity.this, "" + mReview.size(), Toast.LENGTH_LONG).show();
-//
-//                    }},
-//
-//                    new Response.ErrorListener() {
-//                        @Override
-//                        public void onErrorResponse(VolleyError error) {
-//                            //loading.dismiss();
-//                        }
-//                    });
-//        //Adding the request to request queue
-//        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-//        requestQueue.add(stringRequest);
-//        Toast.makeText(DetailsActivity.this, "" + mReview.size(), Toast.LENGTH_LONG).show();
-
-
-        System.out.println("...............mreview大小" + mReview.size());
-
-        imageView = (ImageView) findViewById(R.id.imageView);
-        Picasso.with(getActivity()).load(image).placeholder(R.drawable.loader).into(imageView);
-
-        lvReview = (ListView) findViewById(R.id.lv_review);
-        mReviewAdapter = new ReviewAdapter(getActivity(), R.layout.review_layout, mReview);
-        lvReview.setAdapter(mReviewAdapter);
-//        setReviewListViewHeightBasedOnChildren(lvReview);
-
-        //TODO
-
-        lvVideo = (ListView) findViewById(R.id.lv_video);
-        mVideo = new ArrayList<>();
-        mVideoAdapter = new VideoAdapter(getActivity(), R.layout.video_layout, mVideo);
-        lvVideo.setAdapter(mVideoAdapter);
-
-        lvVideo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key));
-                    startActivity(intent);
-                    Toast.makeText(getApplicationContext(), "Being launched by YouTube", Toast.LENGTH_LONG).show();
-                } catch (ActivityNotFoundException ex) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW,
-                            Uri.parse("http://www.youtube.com/watch?v=" + key));
-                    startActivity(intent);
+            favoriteButton = (Button) rootView.findViewById(R.id.bt_favorite);
+            favoriteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ContentValues contentValues = new ContentValues();
+                    contentValues.put(MovieContract.MovieEntry.COLUMN_TITLE, mMovie.getTitle());
+                    contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_KEY,mMovie.getId());
+                    contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, mMovie.getImage());
+                    getActivity().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
+                    Toast.makeText(getContext(), "Marked as favorite", Toast.LENGTH_LONG).show();
                 }
-            }
-        });
-        return super.onCreateView(inflater, container, savedInstanceState);
+            });
+
+            imageView = (ImageView) rootView.findViewById(R.id.imageView);
+            Picasso.with(getActivity()).load(mMovie.getImage()).placeholder(R.drawable.loader).into(imageView);
+
+            mReview = new ArrayList<>();
+           lvReview = (ListView) rootView.findViewById(R.id.lv_review);
+            mReviewAdapter = new ReviewAdapter(getActivity(), R.layout.review_layout, mReview);
+            lvReview.setAdapter(mReviewAdapter);
+            updateReview();
+
+
+            lvVideo = (ListView) rootView.findViewById(R.id.lv_video);
+            mVideo = new ArrayList<>();
+            mVideoAdapter = new VideoAdapter(getActivity(), R.layout.video_layout, mVideo);
+            lvVideo.setAdapter(mVideoAdapter);
+            updateTrailer();
+
+            lvVideo.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + key));
+                        startActivity(intent);
+                        Toast.makeText(getContext(), "Being launched by YouTube", Toast.LENGTH_LONG).show();
+                    } catch (ActivityNotFoundException ex) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW,
+                                Uri.parse("http://www.youtube.com/watch?v=" + key));
+                        startActivity(intent);
+                    }
+                }
+            });
+        }
+        return rootView;
     }
 
     private void updateTrailer() {
@@ -396,18 +364,18 @@ public class DetailsActivityFragment extends Fragment {
 //        lvReview.setLayoutParams(params);
 //    }
 
-    private void toggleMovieFavorite(){
+    private void toggleMovieFavorite() {
         String selection = MovieContract.MovieEntry.COLUMN_MOVIE_KEY + "= '" + id.trim() + "'";
-        if(queryFM(selection)){
-            Toast.makeText(DetailsActivity.this, "This movie is already in favirate folder !", Toast.LENGTH_LONG).show();
-        }else {
+        if (queryFM(selection)) {
+            Toast.makeText(getActivity(), "This movie is already in favirate folder !", Toast.LENGTH_LONG).show();
+        } else {
             ContentValues contentValues = new ContentValues();
             contentValues.put(MovieContract.MovieEntry.COLUMN_TITLE, title);
-            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_KEY,id);
+            contentValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_KEY, id);
             contentValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, image);
             System.out.println("MovieContract.MovieEntry.COLUMN_TITLE" + title);
             System.out.println("MovieContract.MovieEntry.COLUMN_MOVIE_KEY" + id);
-            getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
+            getActivity().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
             //String stringUri = MovieContract.BASE_CONTENT_URI.toString() + "/movie";
             //Uri uri = Uri.parse(stringUri);
 
@@ -418,13 +386,13 @@ public class DetailsActivityFragment extends Fragment {
 
     private boolean queryFM(String selection) {
         String u = "difiefjie";
-        String columns[] = new String[] {MovieContract.MovieEntry.COLUMN_MOVIE_KEY, MovieContract.MovieEntry.COLUMN_TITLE, MovieContract.MovieEntry.COLUMN_POSTER_PATH };
+        String columns[] = new String[]{MovieContract.MovieEntry.COLUMN_MOVIE_KEY, MovieContract.MovieEntry.COLUMN_TITLE, MovieContract.MovieEntry.COLUMN_POSTER_PATH};
         Uri myUri = MovieContract.MovieEntry.CONTENT_URI;
         //String selection = "123456";//MovieContract.MovieEntry.COLUMN_MOVIE_KEY + "= '" + movieId.trim() + "'";
-        Cursor cur = managedQuery(myUri, columns,selection, null, null );
+        Cursor cur = getActivity().managedQuery(myUri, columns, selection, null, null);
         if (cur.moveToFirst()) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }

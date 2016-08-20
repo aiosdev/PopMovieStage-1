@@ -3,8 +3,10 @@ package udacity.popmoviestage_2;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -34,6 +36,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+import udacity.popmoviestage_2.data.MovieContract;
+
 /**
  * Created by guoecho on 2016/8/12.
  */
@@ -49,6 +53,8 @@ public class MainActivityFragment extends Fragment {
 
     private static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
+    private ArrayList<Movie> mFavoriteMovie;
+
 
     public MainActivityFragment() {
 
@@ -63,6 +69,8 @@ public class MainActivityFragment extends Fragment {
         super.onCreate(savedInstanceState);
         // Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
+
+
 
     }
 
@@ -84,6 +92,13 @@ public class MainActivityFragment extends Fragment {
             startActivity(new Intent(getActivity(), SettingsActivity.class));
             return true;
         }
+        if (id == R.id.action_favorite) {
+
+            queryFavoriteMovies();
+
+            mGridAdapter.setGridData(mFavoriteMovie);
+            Toast.makeText(getContext(), "this is a favorite list !", Toast.LENGTH_LONG).show();
+        }
 
         return super.onOptionsItemSelected(item);
 
@@ -97,27 +112,20 @@ public class MainActivityFragment extends Fragment {
         mGridView = (GridView) view.findViewById(R.id.gridView);
 
         mMovie = new ArrayList<>();
+        mFavoriteMovie = new ArrayList<>();
         mGridAdapter = new GridViewAdapter(getActivity(), R.layout.fragment_main, mMovie);
         mGridView.setAdapter(mGridAdapter);
 
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Movie movie = (Movie) parent.getItemAtPosition(position);
-                Intent intent = new Intent(getActivity(), DetailsActivity.class);
-
-                intent.putExtra("title", movie.getTitle()).
-                        putExtra("image", movie.getImage()).
-                        putExtra("year", movie.getYear()).
-                        putExtra("description", movie.getDesc()).
-                        putExtra("rating", movie.getRating()).
-                        putExtra("votes", movie.getVotes()).
-                        putExtra("id", movie.getId());
-                startActivity(intent);
+                ((Callback) getActivity()).onItemSelected(movie);
             }
         });
 
         return view;
     }
+
 
 
     public void updateMovies() {
@@ -183,6 +191,7 @@ public class MainActivityFragment extends Fragment {
 
             if (result == 1) {
                 mGridAdapter.setGridData(mMovie);
+                mGridAdapter.notifyDataSetChanged();
             } else {
                 Toast.makeText(getActivity(), "Failed to get data", Toast.LENGTH_SHORT).show();
             }
@@ -238,5 +247,31 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
+    private void queryFavoriteMovies() {
+        String columns[] = new String[] {MovieContract.MovieEntry.COLUMN_MOVIE_KEY, MovieContract.MovieEntry.COLUMN_TITLE, MovieContract.MovieEntry.COLUMN_POSTER_PATH, };
+        Uri myUri = MovieContract.MovieEntry.CONTENT_URI;
+        Cursor cur = getActivity().managedQuery(myUri, columns,null, null, null );
+        if(!mFavoriteMovie.isEmpty()){
+            mFavoriteMovie.clear();
+        }
 
+        if (cur.moveToFirst()) {
+            String id = null;
+            String title = null;
+            String posterPath = null;
+            do {
+                id = cur.getString(cur.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_KEY));
+                title = cur.getString(cur.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE));
+                posterPath = cur.getString(cur.getColumnIndex(MovieContract.MovieEntry.COLUMN_POSTER_PATH));
+                //Toast.makeText(this, id + ” ” + userName, Toast.LENGTH_LONG).show();
+                Movie movie = new Movie();
+                movie.setId(id);
+                movie.setTitle(title);
+                movie.setImage(posterPath);
+                mFavoriteMovie.add(movie);
+            } while (cur.moveToNext());
+
+
+        }
+    }
 }

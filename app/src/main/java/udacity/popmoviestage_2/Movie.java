@@ -1,12 +1,15 @@
 package udacity.popmoviestage_2;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
 I use this class to store the information for each movie as a movie object. As part of the first Android project
 I developed, I thought this a good solution. As I progressed, I learned a better way to store and retrieve information,
 using content loaders in later projects.
 */
 
-public class Movie {
+public class Movie implements Parcelable {
     private String image;
     private String title;
     private String desc;
@@ -17,6 +20,28 @@ public class Movie {
 
 
     public Movie() {super();}
+
+    protected Movie(Parcel in) {
+        image = in.readString();
+        title = in.readString();
+        desc = in.readString();
+        year = in.readString();
+        rating = in.readString();
+        votes = in.readString();
+        id = in.readString();
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 
     public String getImage(){return image;}
 
@@ -47,4 +72,20 @@ public class Movie {
     public void setId(String id){this.id=id;}
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int i) {
+        dest.writeString(id);
+        dest.writeString(title);
+        dest.writeString(image);
+        dest.writeString(desc);
+        dest.writeString(year);
+        dest.writeString(rating);
+        dest.writeString(votes);
+
+    }
 }

@@ -8,6 +8,7 @@
 
     <fragment
         android:id="@+id/fragment_movie"
+        android:name="udacity.popmoviestage_2.MainActivityFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="3" />

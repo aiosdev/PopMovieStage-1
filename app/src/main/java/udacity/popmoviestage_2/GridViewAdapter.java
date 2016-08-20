@@ -42,9 +42,9 @@ public class GridViewAdapter extends ArrayAdapter<Movie> {
 
         if (view == null) {
             LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
-            view = inflater.inflate(layoutResourceId, parent, false);
+            view = inflater.inflate(R.layout.grid_item_movie, parent, false);
             holder = new ViewHolder();
-            holder.imageView = (ImageView) view.findViewById(R.id.movie_image);
+            holder.imageView = (ImageView) view.findViewById(R.id.grid_item_image);
             view.setTag(holder);
         } else {
             holder = (ViewHolder) view.getTag();
